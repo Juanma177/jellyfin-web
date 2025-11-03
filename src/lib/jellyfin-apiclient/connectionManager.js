@@ -3,6 +3,7 @@ import { getAuthorizationHeader } from '@jellyfin/sdk/lib/utils';
 import { MINIMUM_VERSION } from '@jellyfin/sdk/lib/versions';
 import { ApiClient } from 'jellyfin-apiclient';
 
+import browser from 'scripts/browser';
 import events from 'utils/events';
 import { ajax } from 'utils/fetch';
 import { equalsIgnoreCase } from 'utils/string';
@@ -566,7 +567,7 @@ export default class ConnectionManager {
             });
         };
 
-        function onSuccessfulConnection(server, systemInfo, connectionMode, serverUrl, verifyLocalAuthentication, resolve, options = {}) {
+function onSuccessfulConnection(server, systemInfo, connectionMode, serverUrl, verifyLocalAuthentication, resolve, options = {}) {
             const credentials = credentialProvider.credentials();
 
             if (options.enableAutoLogin === false) {
@@ -589,10 +590,31 @@ export default class ConnectionManager {
             credentialProvider.addOrUpdateServer(credentials.Servers, server);
             credentialProvider.credentials(credentials);
 
+            // ==================================================
+            // START MODIFICATION
+            // ==================================================
+            
+            // Check if the browser is Tizen
+            if (browser.tizen) {
+                // Construct the URL for the server's web UI
+                const serverWebUiUrl = `${serverUrl}/web/index.html`;
+
+                // Redirect the entire Tizen app to the server's UI
+                window.location.href = serverWebUiUrl;
+
+                // Stop further execution in the embedded app
+                return;
+            }
+            
+            // ==================================================
+            // END MODIFICATION
+            // ==================================================
+
             const result = {
                 Servers: []
             };
 
+    
             result.ApiClient = self._getOrAddApiClient(server, serverUrl);
 
             result.ApiClient.setSystemInfo(systemInfo);
