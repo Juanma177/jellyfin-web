@@ -590,26 +590,12 @@ function onSuccessfulConnection(server, systemInfo, connectionMode, serverUrl, v
             credentialProvider.addOrUpdateServer(credentials.Servers, server);
             credentialProvider.credentials(credentials);
 
-            // ==================================================
-            // START MODIFICATION
-            // ==================================================
-            
-            // Check if the browser is Tizen
             if (browser.tizen) {
-                // Construct the URL for the server's web UI
                 const serverWebUiUrl = `${serverUrl}/web/index.html`;
-
-                // Redirect the entire Tizen app to the server's UI
                 window.location.href = serverWebUiUrl;
-
-                // Stop further execution in the embedded app
                 return;
             }
             
-            // ==================================================
-            // END MODIFICATION
-            // ==================================================
-
             const result = {
                 Servers: []
             };
